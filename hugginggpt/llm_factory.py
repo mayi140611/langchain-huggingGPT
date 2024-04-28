@@ -35,26 +35,33 @@ def create_llms() -> LLMs:
 
     task_parsing_highlight_ids = get_token_ids_for_task_parsing()
     choose_model_highlight_ids = get_token_ids_for_choose_model()
-
-    task_planning_llm = OpenAI(
-        model_name=LLM_NAME,
-        temperature=0,
-        logit_bias={
-            token_id: TASK_PLANNING_LOGIT_BIAS
-            for token_id in task_parsing_highlight_ids
-        },
-    )
-    model_selection_llm = OpenAI(
-        model_name=LLM_NAME,
-        temperature=0,
-        logit_bias={
-            token_id: MODEL_SELECTION_LOGIT_BIAS
-            for token_id in choose_model_highlight_ids
-        },
-    )
-    model_inference_llm = OpenAI(model_name=LLM_NAME, temperature=0)
-    response_generation_llm = OpenAI(model_name=LLM_NAME, temperature=0)
-    output_fixing_llm = OpenAI(model_name=LLM_NAME, temperature=0)
+    # from langchain_openai import ChatOpenAI
+    # llm = ChatOpenAI(
+    #         openai_api_base='http://localhost:11434/v1/',
+    #         openai_api_key='ollama',
+    #         model='llama3',
+    #         temperature=0,
+    #         verbose=True,
+    #         streaming=True
+    #     )
+    import os 
+    from langchain.chat_models import AzureChatOpenAI
+    llm = AzureChatOpenAI(
+            openai_api_base=os.getenv('GPT35_AZURE_BASE_URL'),
+            openai_api_version=os.getenv('GPT35_VERSION'),
+            deployment_name=os.getenv('GPT35_AZURE_DEPLOYMENT_NAME'),
+            openai_api_key=os.getenv('GPT35_AZURE_API_KEY'),
+            openai_api_type='azure',
+            temperature=0,
+            streaming=True,
+            verbose=True,
+            # callbacks=[StreamingStdOutCallbackHandler()]
+        )
+    task_planning_llm = llm
+    model_selection_llm = llm
+    model_inference_llm = llm
+    response_generation_llm = llm
+    output_fixing_llm = llm
     return LLMs(
         task_planning_llm=task_planning_llm,
         model_selection_llm=model_selection_llm,

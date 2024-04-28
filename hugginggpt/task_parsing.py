@@ -1,6 +1,6 @@
 import copy
 import logging
-
+from typing import List
 from pydantic import BaseModel, Field
 
 from hugginggpt.exceptions import TaskParsingException, wrap_exceptions
@@ -32,14 +32,17 @@ class Task(BaseModel):
         generated_resources = {
             k: parse_task_id(v) for k, v in self.args.items() if GENERATED_TOKEN in v
         }
+        print(f"generated_resources: {generated_resources}")
         logger.info(
-            f"Resources to replace, resource type -> task id: {generated_resources}"
+            f"Resources to replace, resource type -> task id: {generated_resources}" # {'text': 0}
         )
+        
         for resource_type, task_id in generated_resources.items():
+            print(f"task_summaries[task_id].inference_result: {task_summaries[task_id].inference_result}")
             matches = [
                 v
-                for k, v in task_summaries[task_id].inference_result.items()
-                if self.is_matching_generated_resource(k, resource_type)
+                for k, v in task_summaries[task_id].inference_result.items() # {'generated image': '/images/9023.png'}
+                # if self.is_matching_generated_resource(k, resource_type)
             ]
             if len(matches) == 1:
                 logger.info(
@@ -65,7 +68,7 @@ class Task(BaseModel):
 
 
 class Tasks(BaseModel):
-    __root__: list[Task] = Field(description="List of Machine Learning tasks")
+    __root__: List[Task] = Field(description="List of Machine Learning tasks")
 
     def __iter__(self):
         return iter(self.__root__)

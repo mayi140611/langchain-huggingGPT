@@ -38,7 +38,7 @@ class Client:
     def is_init(self) -> bool:
         return (
             os.environ.get("OPENAI_API_KEY")
-            and os.environ.get("OPENAI_API_KEY").startswith("sk-")
+            # and os.environ.get("OPENAI_API_KEY").startswith("sk-")
             and os.environ.get("HUGGINGFACEHUB_API_TOKEN")
             and os.environ.get("HUGGINGFACEHUB_API_TOKEN").startswith("hf_")
         )
@@ -51,6 +51,7 @@ class Client:
             )
         if not self.llms:
             self.llms = create_llms()
+            print(f"self.llms: {self.llms}")
 
         self.last_user_input = user_input
         try:
@@ -183,6 +184,7 @@ with gr.Blocks(css=css) as demo:
             "Write a poem about sheep, then read it to me",
             "Transcribe the audio file found at /audios/499e.flac. Then tell me how similar the transcription is to the following sentence: Sheep are nice.",
             "Tell me a joke about a sheep, then illustrate it by generating an image",
+            "Please generate an image where a girl is reading a book, then please describe the new image with your voice."
         ],
         inputs=txt,
     )

@@ -27,9 +27,13 @@ def plan_tasks(
     )
     llm_chain = LLMChain(prompt=task_planning_prompt_template, llm=llm)
     history_truncated = truncate_history(history)
-    output = llm_chain.predict(
-        user_input=user_input, history=history_truncated, stop=["<im_end>"]
-    )
+    print(f"user_input: {user_input}")
+    print(f"history: {history_truncated}")
+    output = llm_chain.invoke({"user_input": user_input, "history": history_truncated})['text']
+    start_ix = output.find("[{")
+    end_ix = output.find("}]")
+    output = output[start_ix: end_ix+2]
+    print(output)
     logger.info(f"Task planning raw output: {output}")
     tasks = parse_tasks(output)
     return tasks
